@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto Agustine · Seguimiento de sesiones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul-institucional: #1B3A5C;
+    --azul-suave: #2F567F;
+    --oro: #C99A45;
+    --crema: #F6F3EC;
+    --carbon: #262420;
+    --verde-avance: #4C7C6C;
+    --terracota-alerta: #B75A3E;
+    --linea: rgba(38,36,32,0.12);
+    --radio: 14px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--crema);
+    color: var(--carbon);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .fondo-textura{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(27,58,92,0.05) 1px, transparent 0);
+    background-size: 22px 22px;
+    z-index: 0;
+  }
+
+  .contenedor{
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    background: linear-gradient(160deg, var(--azul-institucional) 0%, var(--azul-suave) 100%);
+    color: #F6F3EC;
+    padding: 56px 24px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header.hero::after{
+    content: "";
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,154,69,0.28), transparent 70%);
+  }
+
+  .hero-inner{
+    max-width: 980px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oro);
+    margin: 0 0 14px;
+  }
+
+  h1.titulo{
+    font-family: 'Zilla Slab', serif;
+    font-weight: 700;
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.05;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  p.subtitulo{
+    font-size: 16px;
+    max-width: 560px;
+    color: rgba(246,243,236,0.82);
+    line-height: 1.55;
+    margin: 0 0 36px;
+  }
+
+  .resumen{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: rgba(246,243,236,0.18);
+    border-radius: var(--radio);
+    overflow: hidden;
+  }
+
+  .resumen .dato{
+    background: rgba(255,255,255,0.05);
+    padding: 18px 20px;
+  }
+
+  .resumen .num{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 26px;
+    font-weight: 600;
+    display: block;
+    color: #fff;
+  }
+
+  .resumen .etq{
+    font-size: 12px;
+    color: rgba(246,243,236,0.7);
+    margin-top: 4px;
+  }
+
+  /* ---------- FILTROS ---------- */
+  .filtros{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 40px 0 28px;
+  }
+
+  .chip{
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--linea);
+    background: #fff;
+    color: var(--azul-institucional);
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+
+  .chip:hover{ border-color: var(--azul-institucional); }
+
+  .chip.activo{
+    background: var(--azul-institucional);
+    border-color: var(--azul-institucional);
+    color: #fff;
+  }
+
+  /* ---------- TARJETAS ---------- */
+  .escuelas{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .tarjeta{
+    background: #fff;
+    border: 1px solid var(--linea);
+    border-radius: var(--radio);
+    padding: 28px 28px 26px;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+
+  .tarjeta.oculta{
+    display: none;
+  }
+
+  .tarjeta-cabecera{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  h2.nombre-escuela{
+    font-family: 'Zilla Slab', serif;
+    font-weight: 600;
+    font-size: 21px;
+    margin: 0 0 8px;
+    color: var(--azul-institucional);
+    line-height: 1.25;
+  }
+
+  .depto{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--verde-avance);
+    background: rgba(76,124,108,0.1);
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  .depto::before{
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--verde-avance);
+  }
+
+  .grupos-total{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: rgba(38,36,32,0.5);
+    white-space: nowrap;
+  }
+
+  /* ---------- GRUPO / CAMINO DE SESIONES ---------- */
+  .grupo{
+    margin-bottom: 22px;
+  }
+
+  .grupo:last-of-type{
+    margin-bottom: 0;
+  }
+
+  .grupo-fila{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+
+  .grupo-nombre{
+    font-weight: 600;
+    font-size: 14.5px;
+  }
+
+  .grupo-sesion{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--oro);
+    font-weight: 600;
+  }
+
+  .camino{
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .paso-envoltorio{
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .paso-envoltorio:last-child{ flex: 0; }
+
+  .paso{
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--linea);
+    background: #fff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: rgba(38,36,32,0.35);
+    position: relative;
+  }
+
+  .paso.completo{
+    background: var(--verde-avance);
+    border-color: var(--verde-avance);
+    color: #fff;
+  }
+
+  .paso.actual{
+    background: var(--oro);
+    border-color: var(--oro);
+    color: var(--carbon);
+    box-shadow: 0 0 0 4px rgba(201,154,69,0.22);
+  }
+
+  .conector{
+    flex: 1;
+    height: 2px;
+    background: var(--linea);
+    margin: 0 2px;
+  }
+
+  .conector.completo{
+    background: var(--verde-avance);
+  }
+
+  /* ---------- FORMADORES ---------- */
+  .formadores{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .formadores-etiqueta{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(38,36,32,0.4);
+    margin-right: 4px;
+  }
+
+  .formador{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--azul-institucional);
+    background: rgba(27,58,92,0.06);
+    padding: 5px 10px 5px 7px;
+    border-radius: 999px;
+  }
+
+  .formador .inicial{
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--azul-institucional);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ---------- MICROPROYECTOS ---------- */
+  .microproyectos{
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--linea);
+  }
+
+  .micro-etiqueta{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(38,36,32,0.45);
+    margin: 0 0 10px;
+  }
+
+  .micro-vacio{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: rgba(183,90,62,0.07);
+    border: 1px solid rgba(183,90,62,0.18);
+    border-radius: 10px;
+    color: var(--terracota-alerta);
+    font-size: 13.5px;
+  }
+
+  .micro-vacio svg{ flex-shrink: 0; }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    text-align: center;
+    padding: 40px 24px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: rgba(38,36,32,0.4);
+  }
+
+  @media (max-width: 620px){
+    .resumen{ grid-template-columns: repeat(2, 1fr); }
+    .tarjeta-cabecera{ flex-direction: column; }
+    .paso{ width: 22px; height: 22px; font-size: 9px; }
+  }
+
+  :focus-visible{
+    outline: 2px solid var(--oro);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fondo-textura"></div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Proyecto Agustine</p>
+    <h1 class="titulo">Seguimiento de sesiones</h1>
+    <p class="subtitulo">Avance de los grupos de trabajo en cada centro educativo, a lo largo de las 8 sesiones socioformativas para el desarrollo de microproyectos.</p>
+    <div class="resumen" id="resumen"></div>
+  </div>
+</header>
+
+<main class="contenedor">
+  <div class="filtros" id="filtros"></div>
+  <div class="escuelas" id="escuelas"></div>
+</main>
+
+<footer>Panel de seguimiento · Actualizado manualmente por el equipo coordinador</footer>
+
+<script>
+  const datos = [
+    {
+      nombre: "Instituto Nacional de Nueva Guadalupe",
+      departamento: "San Miguel",
+      grupos: [
+        {
+          nombre: "Grupo",
+          sesionActual: 3,
+          formadores: ["Eva María", "Israel Quiñonez", "Lorena Campos", "Noemi Pacheco", "Rubén Paiz"]
+        }
+      ],
+      microproyectos: []
+    },
+    {
+      nombre: "Centro Escolar María Luisa Parada",
+      departamento: "San Miguel",
+      grupos: [
+        {
+          nombre: "Grupo",
+          sesionActual: 2,
+          formadores: ["Aldair Coreas", "Elenilson Zelaya", "Karina Martínez"]
+        }
+      ],
+      microproyectos: []
+    },
+    {
+      nombre: "Complejo Educativo Mario Gómez",
+      departamento: "La Unión",
+      grupos: [
+        {
+          nombre: "Grupo 1",
+          sesionActual: 1,
+          formadores: ["Alfredo Ponce", "Juan Romero"]
+        },
+        {
+          nombre: "Grupo 2",
+          sesionActual: 3,
+          formadores: ["Amanda Álvarez", "José Carlos"]
+        }
+      ],
+      microproyectos: []
+    }
+  ];
+
+  const TOTAL_SESIONES = 8;
+
+  function construirCamino(sesionActual){
+    let html = '<div class="camino">';
+    for(let i = 1; i <= TOTAL_SESIONES; i++){
+      const completo = i < sesionActual;
+      const actual = i === sesionActual;
+      let clase = 'paso';
+      if(completo) clase += ' completo';
+      if(actual) clase += ' actual';
+      html += `<div class="paso-envoltorio"><div class="${clase}">${i}</div>`;
+      if(i < TOTAL_SESIONES){
+        html += `<div class="conector${completo ? ' completo' : ''}"></div>`;
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function inicialesDe(nombre){
+    return nombre
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(p => p[0].toUpperCase())
+      .join('');
+  }
+
+  function construirFormadores(formadores){
+    if(!formadores || !formadores.length) return '';
+    const chips = formadores.map(f => `
+      <span class="formador">
+        <span class="inicial">${inicialesDe(f)}</span>${f}
+      </span>
+    `).join('');
+    return `
+      <div class="formadores">
+        <span class="formadores-etiqueta">Formadores</span>
+        ${chips}
+      </div>
+    `;
+  }
+
+  function construirTarjeta(escuela){
+    const gruposHTML = escuela.grupos.map(g => `
+      <div class="grupo">
+        <div class="grupo-fila">
+          <span class="grupo-nombre">${g.nombre}</span>
+          <span class="grupo-sesion">Sesión ${g.sesionActual} de ${TOTAL_SESIONES}</span>
+        </div>
+        ${construirCamino(g.sesionActual)}
+        ${construirFormadores(g.formadores)}
+      </div>
+    `).join('');
+
+    const microHTML = escuela.microproyectos.length
+      ? escuela.microproyectos.map(m => `<div>${m}</div>`).join('')
+      : `<div class="micro-vacio">
+           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+             <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
+             <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+             <circle cx="8" cy="11" r="0.8" fill="currentColor"/>
+           </svg>
+           No hay microproyectos registrados
+         </div>`;
+
+    return `
+      <article class="tarjeta" data-departamento="${escuela.departamento}">
+        <div class="tarjeta-cabecera">
+          <div>
+            <h2 class="nombre-escuela">${escuela.nombre}</h2>
+            <span class="depto">${escuela.departamento}</span>
+          </div>
+          <span class="grupos-total">${escuela.grupos.length} ${escuela.grupos.length > 1 ? 'grupos' : 'grupo'}</span>
+        </div>
+        ${gruposHTML}
+        <div class="microproyectos">
+          <p class="micro-etiqueta">Microproyectos</p>
+          ${microHTML}
+        </div>
+      </article>
+    `;
+  }
+
+  function construirResumen(){
+    const totalEscuelas = datos.length;
+    const totalGrupos = datos.reduce((acc, e) => acc + e.grupos.length, 0);
+    const departamentos = new Set(datos.map(e => e.departamento)).size;
+    const sesionesAcumuladas = datos.reduce((acc, e) =>
+      acc + e.grupos.reduce((s, g) => s + g.sesionActual, 0), 0);
+    const sesionesPosibles = totalGrupos * TOTAL_SESIONES;
+
+    const datosResumen = [
+      { num: totalEscuelas, etq: 'Centros educativos' },
+      { num: totalGrupos, etq: 'Grupos activos' },
+      { num: departamentos, etq: 'Departamentos' },
+      { num: `${sesionesAcumuladas}/${sesionesPosibles}`, etq: 'Sesiones completadas' }
+    ];
+
+    document.getElementById('resumen').innerHTML = datosResumen.map(d =>
+      `<div class="dato"><span class="num">${d.num}</span><span class="etq">${d.etq}</span></div>`
+    ).join('');
+  }
+
+  function construirFiltros(){
+    const departamentos = ['Todos', ...new Set(datos.map(e => e.departamento))];
+    const cont = document.getElementById('filtros');
+    cont.innerHTML = departamentos.map((d, i) =>
+      `<button class="chip${i === 0 ? ' activo' : ''}" data-filtro="${d}">${d}</button>`
+    ).join('');
+
+    cont.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        cont.querySelectorAll('.chip').forEach(c => c.classList.remove('activo'));
+        chip.classList.add('activo');
+        const filtro = chip.dataset.filtro;
+        document.querySelectorAll('.tarjeta').forEach(t => {
+          const coincide = filtro === 'Todos' || t.dataset.departamento === filtro;
+          t.classList.toggle('oculta', !coincide);
+        });
+      });
+    });
+  }
+
+  function renderizar(){
+    construirResumen();
+    construirFiltros();
+    document.getElementById('escuelas').innerHTML = datos.map(construirTarjeta).join('');
+  }
+
+  renderizar();
+</script>
+
+</body>
+</html>
