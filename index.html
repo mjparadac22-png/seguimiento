@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proyecto Agustine · Seguimiento de sesiones</title>
+<title>Mi Nueva Escuela · Seguimiento de sesiones</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -228,14 +228,6 @@
   }
 
   /* ---------- GRUPO / CAMINO DE SESIONES ---------- */
-  .grupo{
-    margin-bottom: 22px;
-  }
-
-  .grupo:last-of-type{
-    margin-bottom: 0;
-  }
-
   .grupo-fila{
     display: flex;
     justify-content: space-between;
@@ -355,10 +347,20 @@
   }
 
   /* ---------- MICROPROYECTOS ---------- */
+  .grupo{
+    margin-bottom: 26px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  .grupo:last-of-type{
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
   .microproyectos{
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px dashed var(--linea);
+    margin-top: 18px;
   }
 
   .micro-etiqueta{
@@ -368,6 +370,33 @@
     text-transform: uppercase;
     color: rgba(38,36,32,0.45);
     margin: 0 0 10px;
+  }
+
+  .micro-lista{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .micro-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--verde-avance);
+    background: rgba(76,124,108,0.1);
+    border: 1px solid rgba(76,124,108,0.2);
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+
+  .micro-chip::before{
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--verde-avance);
   }
 
   .micro-vacio{
@@ -415,9 +444,9 @@
 
 <header class="hero">
   <div class="hero-inner">
-    <p class="eyebrow">Proyecto Agustine</p>
+    <p class="eyebrow">Mi Nueva Escuela · Estrategia Nacional</p>
     <h1 class="titulo">Seguimiento de sesiones</h1>
-    <p class="subtitulo">Avance de los grupos de trabajo en cada centro educativo, a lo largo de las 8 sesiones socioformativas para el desarrollo de microproyectos.</p>
+    <p class="subtitulo">Avance de los grupos de trabajo en cada centro educativo, a lo largo de las 8 sesiones de prevención de violencia, equidad de género e integración social.</p>
     <div class="resumen" id="resumen"></div>
   </div>
 </header>
@@ -427,7 +456,7 @@
   <div class="escuelas" id="escuelas"></div>
 </main>
 
-<footer>Panel de seguimiento ·</footer>
+<footer>Panel de seguimiento · Actualizado manualmente por el equipo coordinador</footer>
 
 <script>
   const datos = [
@@ -438,10 +467,10 @@
         {
           nombre: "Grupo",
           sesionActual: 3,
-          formadores: ["Eva María", "Israel Quiñonez", "Lorena Campos", "Noemi Pacheco", "Rubén Paiz"]
+          formadores: ["Eva María", "Israel Quiñonez", "Lorena Campos", "Noemi Pacheco", "Rubén Paiz"],
+          microproyectos: ["Conectando Mentes, Jugando Juntos", "Escuela Limpia, Comunidad Sana"]
         }
-      ],
-      microproyectos: []
+      ]
     },
     {
       nombre: "Centro Escolar María Luisa Parada",
@@ -450,10 +479,10 @@
         {
           nombre: "Grupo",
           sesionActual: 2,
-          formadores: ["Aldair Coreas", "Elenilson Zelaya", "Karina Martínez"]
+          formadores: ["Aldair Coreas", "Elenilson Zelaya", "Karina Martínez"],
+          microproyectos: ["Demostrando habilidades fisicas explorando la magia de los deportes"]
         }
-      ],
-      microproyectos: []
+      ]
     },
     {
       nombre: "Complejo Educativo Mario Gómez",
@@ -461,16 +490,17 @@
       grupos: [
         {
           nombre: "Grupo 1",
-          sesionActual: 2,
-          formadores: ["Alfredo Ponce", "Juan Romero"]
+          sesionActual: 4,
+          formadores: ["Alfredo Ponce", "Juan Romero"],
+          microproyectos: ["Peleas o conflictos entre estudiantes", "Peleas o conflictos entre estudiantes durante los recesos","Aislamiento o exclusion de algunos niños, niñas o jóvenes", "Situaciones de Bullying entre compañeros"]
         },
         {
           nombre: "Grupo 2",
           sesionActual: 3,
-          formadores: ["Amanda Álvarez", "José Carlos"]
+          formadores: ["Amanda Álvarez", "José Carlos"],
+          microproyectos: ["Invisible pero real: El Bullying discreto"]
         }
-      ],
-      microproyectos: []
+      ]
     }
   ];
 
@@ -518,6 +548,32 @@
     `;
   }
 
+  function construirMicroproyectos(microproyectos){
+    if(microproyectos && microproyectos.length){
+      return `
+        <div class="microproyectos">
+          <p class="micro-etiqueta">Microproyectos</p>
+          <div class="micro-lista">
+            ${microproyectos.map(m => `<span class="micro-chip">${m}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+    return `
+      <div class="microproyectos">
+        <p class="micro-etiqueta">Microproyectos</p>
+        <div class="micro-vacio">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="8" cy="11" r="0.8" fill="currentColor"/>
+          </svg>
+          No hay microproyectos registrados
+        </div>
+      </div>
+    `;
+  }
+
   function construirTarjeta(escuela){
     const gruposHTML = escuela.grupos.map(g => `
       <div class="grupo">
@@ -527,19 +583,9 @@
         </div>
         ${construirCamino(g.sesionActual)}
         ${construirFormadores(g.formadores)}
+        ${construirMicroproyectos(g.microproyectos)}
       </div>
     `).join('');
-
-    const microHTML = escuela.microproyectos.length
-      ? escuela.microproyectos.map(m => `<div>${m}</div>`).join('')
-      : `<div class="micro-vacio">
-           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-             <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
-             <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-             <circle cx="8" cy="11" r="0.8" fill="currentColor"/>
-           </svg>
-           No hay microproyectos registrados
-         </div>`;
 
     return `
       <article class="tarjeta" data-departamento="${escuela.departamento}">
@@ -551,10 +597,6 @@
           <span class="grupos-total">${escuela.grupos.length} ${escuela.grupos.length > 1 ? 'grupos' : 'grupo'}</span>
         </div>
         ${gruposHTML}
-        <div class="microproyectos">
-          <p class="micro-etiqueta">Microproyectos</p>
-          ${microHTML}
-        </div>
       </article>
     `;
   }
