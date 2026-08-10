@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seguimiento de sesiones</title>
+<title>Proyecto Agustine · Seguimiento de sesiones</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -446,7 +446,7 @@
   <div class="hero-inner">
     <p class="eyebrow">Proyecto Agustine</p>
     <h1 class="titulo">Seguimiento de sesiones</h1>
-    <p class="subtitulo">Avance de los grupos de trabajo en cada centro educativo, a lo largo de las 8 sesiones socioformativas.</p>
+    <p class="subtitulo">Avance de los grupos de trabajo en cada centro educativo.</p>
     <div class="resumen" id="resumen"></div>
   </div>
 </header>
@@ -456,7 +456,7 @@
   <div class="escuelas" id="escuelas"></div>
 </main>
 
-<footer>Panel de seguimiento · Actualizado manualmente</footer>
+<footer>Panel de seguimiento</footer>
 
 <script>
   const datos = [
@@ -466,9 +466,9 @@
       grupos: [
         {
           nombre: "Grupo",
-          sesionActual: 5,
+          sesionActual: 6,
           formadores: ["Eva María", "Israel Quiñonez", "Lorena Campos", "Noemi Pacheco", "Rubén Paiz"],
-          microproyectos: ["Conectando Mentes, Jugando Juntos", "Escuela Limpia, Comunidad Sana"]
+          microproyectos: ["Conectando Mentes, Jugando Juntos", "Escuela Limpia"]
         }
       ]
     },
@@ -478,9 +478,9 @@
       grupos: [
         {
           nombre: "Grupo",
-          sesionActual: 5,
+          sesionActual: 6,
           formadores: ["Aldair Coreas", "Elenilson Zelaya", "Karina Martínez"],
-          microproyectos: ["Demostrando habilidades fisicas explorando la magia de los deportes"]
+          microproyectos: ["Demostrando habilidades físicas explorando la magia de los deportes"]
         }
       ]
     },
@@ -490,15 +490,39 @@
       grupos: [
         {
           nombre: "Grupo 1",
-          sesionActual: 4,
+          sesionActual: 5,
           formadores: ["Alfredo Ponce", "Juan Romero"],
-          microproyectos: ["Peleas o conflictos entre estudiantes durante los recesos","Aislamiento o exclusion de algunos niños, niñas o jóvenes", "Situaciones de Bullying entre compañeros"]
+          microproyectos: ["Peleas o conflictos entre estudiantes durante los recesos", "Aislamiento o exclusión de algunos niños, niñas o jóvenes", "Situaciones de Bullying entre compañeros"]
         },
         {
           nombre: "Grupo 2",
-          sesionActual: 3,
+          sesionActual: 4,
           formadores: ["Amanda Álvarez", "José Carlos"],
           microproyectos: ["Invisible pero real: El Bullying discreto"]
+        }
+      ]
+    },
+    {
+      nombre: "Centro Escolar Dolores Souza",
+      departamento: "San Miguel",
+      grupos: [
+        {
+          nombre: "Grupo",
+          sesionActual: 1,
+          formadores: ["Flora Abelina Moreira", "Ruth Nohemy Funes", "Jaime Omar Salmerón", "Marvin Turcios"],
+          microproyectos: []
+        }
+      ]
+    },
+    {
+      nombre: "Complejo Educativo Aminta de Montiel",
+      departamento: "San Miguel",
+      grupos: [
+        {
+          nombre: "Grupo",
+          sesionActual: 1,
+          formadores: ["Carrie Ashley Henríquez", "María Elena Pineda", "Alex Nolasco", "Dámaso López", "Génesis Amaya"],
+          microproyectos: []
         }
       ]
     }
