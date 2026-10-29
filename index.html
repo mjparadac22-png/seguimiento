@@ -1,678 +1,620 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proyecto Agustine · Seguimiento de sesiones</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --azul-institucional: #1B3A5C;
-    --azul-suave: #2F567F;
-    --oro: #C99A45;
-    --crema: #F6F3EC;
-    --carbon: #262420;
-    --verde-avance: #4C7C6C;
-    --terracota-alerta: #B75A3E;
-    --linea: rgba(38,36,32,0.12);
-    --radio: 14px;
-  }
-
-  *{ box-sizing: border-box; }
-
-  html{ scroll-behavior: smooth; }
-
-  body{
-    margin:0;
-    background: var(--crema);
-    color: var(--carbon);
-    font-family: 'Inter', sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .fondo-textura{
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(27,58,92,0.05) 1px, transparent 0);
-    background-size: 22px 22px;
-    z-index: 0;
-  }
-
-  .contenedor{
-    position: relative;
-    z-index: 1;
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  /* ---------- HERO ---------- */
-  header.hero{
-    background: linear-gradient(160deg, var(--azul-institucional) 0%, var(--azul-suave) 100%);
-    color: #F6F3EC;
-    padding: 56px 24px 64px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  header.hero::after{
-    content: "";
-    position: absolute;
-    right: -60px;
-    top: -60px;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(201,154,69,0.28), transparent 70%);
-  }
-
-  .hero-inner{
-    max-width: 980px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  .eyebrow{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--oro);
-    margin: 0 0 14px;
-  }
-
-  h1.titulo{
-    font-family: 'Zilla Slab', serif;
-    font-weight: 700;
-    font-size: clamp(32px, 5vw, 48px);
-    line-height: 1.05;
-    margin: 0 0 12px;
-    letter-spacing: -0.01em;
-  }
-
-  p.subtitulo{
-    font-size: 16px;
-    max-width: 560px;
-    color: rgba(246,243,236,0.82);
-    line-height: 1.55;
-    margin: 0 0 36px;
-  }
-
-  .resumen{
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: rgba(246,243,236,0.18);
-    border-radius: var(--radio);
-    overflow: hidden;
-  }
-
-  .resumen .dato{
-    background: rgba(255,255,255,0.05);
-    padding: 18px 20px;
-  }
-
-  .resumen .num{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 26px;
-    font-weight: 600;
-    display: block;
-    color: #fff;
-  }
-
-  .resumen .etq{
-    font-size: 12px;
-    color: rgba(246,243,236,0.7);
-    margin-top: 4px;
-  }
-
-  /* ---------- FILTROS ---------- */
-  .filtros{
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 40px 0 28px;
-  }
-
-  .chip{
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 9px 16px;
-    border-radius: 999px;
-    border: 1px solid var(--linea);
-    background: #fff;
-    color: var(--azul-institucional);
-    cursor: pointer;
-    transition: all .15s ease;
-  }
-
-  .chip:hover{ border-color: var(--azul-institucional); }
-
-  .chip.activo{
-    background: var(--azul-institucional);
-    border-color: var(--azul-institucional);
-    color: #fff;
-  }
-
-  /* ---------- TARJETAS ---------- */
-  .escuelas{
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .tarjeta{
-    background: #fff;
-    border: 1px solid var(--linea);
-    border-radius: var(--radio);
-    padding: 28px 28px 26px;
-    transition: opacity .2s ease, transform .2s ease;
-  }
-
-  .tarjeta.oculta{
-    display: none;
-  }
-
-  .tarjeta-cabecera{
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 22px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--linea);
-  }
-
-  h2.nombre-escuela{
-    font-family: 'Zilla Slab', serif;
-    font-weight: 600;
-    font-size: 21px;
-    margin: 0 0 8px;
-    color: var(--azul-institucional);
-    line-height: 1.25;
-  }
-
-  .depto{
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11.5px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--verde-avance);
-    background: rgba(76,124,108,0.1);
-    padding: 5px 10px;
-    border-radius: 6px;
-  }
-
-  .depto::before{
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--verde-avance);
-  }
-
-  .grupos-total{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: rgba(38,36,32,0.5);
-    white-space: nowrap;
-  }
-
-  /* ---------- GRUPO / CAMINO DE SESIONES ---------- */
-  .grupo-fila{
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 12px;
-  }
-
-  .grupo-nombre{
-    font-weight: 600;
-    font-size: 14.5px;
-  }
-
-  .grupo-sesion{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12.5px;
-    color: var(--oro);
-    font-weight: 600;
-  }
-
-  .camino{
-    display: flex;
-    align-items: center;
-    gap: 0;
-  }
-
-  .paso-envoltorio{
-    display: flex;
-    align-items: center;
-    flex: 1;
-  }
-
-  .paso-envoltorio:last-child{ flex: 0; }
-
-  .paso{
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 2px solid var(--linea);
-    background: #fff;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    color: rgba(38,36,32,0.35);
-    position: relative;
-  }
-
-  .paso.completo{
-    background: var(--verde-avance);
-    border-color: var(--verde-avance);
-    color: #fff;
-  }
-
-  .paso.actual{
-    background: var(--oro);
-    border-color: var(--oro);
-    color: var(--carbon);
-    box-shadow: 0 0 0 4px rgba(201,154,69,0.22);
-  }
-
-  .conector{
-    flex: 1;
-    height: 2px;
-    background: var(--linea);
-    margin: 0 2px;
-  }
-
-  .conector.completo{
-    background: var(--verde-avance);
-  }
-
-  /* ---------- FORMADORES ---------- */
-  .formadores{
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
-  }
-
-  .formadores-etiqueta{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: rgba(38,36,32,0.4);
-    margin-right: 4px;
-  }
-
-  .formador{
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--azul-institucional);
-    background: rgba(27,58,92,0.06);
-    padding: 5px 10px 5px 7px;
-    border-radius: 999px;
-  }
-
-  .formador .inicial{
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--azul-institucional);
-    color: #fff;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9.5px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  /* ---------- MICROPROYECTOS ---------- */
-  .grupo{
-    margin-bottom: 26px;
-    padding-bottom: 22px;
-    border-bottom: 1px solid var(--linea);
-  }
-
-  .grupo:last-of-type{
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-  }
-
-  .microproyectos{
-    margin-top: 18px;
-  }
-
-  .micro-etiqueta{
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(38,36,32,0.45);
-    margin: 0 0 10px;
-  }
-
-  .micro-lista{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .micro-chip{
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--verde-avance);
-    background: rgba(76,124,108,0.1);
-    border: 1px solid rgba(76,124,108,0.2);
-    padding: 6px 12px;
-    border-radius: 999px;
-  }
-
-  .micro-chip::before{
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--verde-avance);
-  }
-
-  .micro-vacio{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-    background: rgba(183,90,62,0.07);
-    border: 1px solid rgba(183,90,62,0.18);
-    border-radius: 10px;
-    color: var(--terracota-alerta);
-    font-size: 13.5px;
-  }
-
-  .micro-vacio svg{ flex-shrink: 0; }
-
-  /* ---------- FOOTER ---------- */
-  footer{
-    text-align: center;
-    padding: 40px 24px 0;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11.5px;
-    color: rgba(38,36,32,0.4);
-  }
-
-  @media (max-width: 620px){
-    .resumen{ grid-template-columns: repeat(2, 1fr); }
-    .tarjeta-cabecera{ flex-direction: column; }
-    .paso{ width: 22px; height: 22px; font-size: 9px; }
-  }
-
-  :focus-visible{
-    outline: 2px solid var(--oro);
-    outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ transition: none !important; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto Agustine - Informe de Seguimiento</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#035485',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-<div class="fondo-textura"></div>
-
-<header class="hero">
-  <div class="hero-inner">
-    <p class="eyebrow">Proyecto Agustine</p>
-    <h1 class="titulo">Seguimiento de sesiones</h1>
-    <p class="subtitulo">Avance de los grupos de trabajo en cada centro educativo.</p>
-    <div class="resumen" id="resumen"></div>
-  </div>
-</header>
-
-<main class="contenedor">
-  <div class="filtros" id="filtros"></div>
-  <div class="escuelas" id="escuelas"></div>
-</main>
-
-<footer>Panel de seguimiento</footer>
-
-<script>
-  const datos = [
-    {
-      nombre: "Instituto Nacional de Nueva Guadalupe",
-      departamento: "San Miguel",
-      grupos: [
-        {
-          nombre: "Grupo",
-          sesionActual: 8,
-          formadores: ["Eva María", "Israel Quiñonez", "Lorena Campos", "Noemi Pacheco", "Rubén Paiz"],
-          microproyectos: ["Conectando Mentes, Jugando Juntos", "Escuela Limpia"]
-        }
-      ]
-    },
-    {
-      nombre: "Centro Escolar María Luisa Parada",
-      departamento: "San Miguel",
-      grupos: [
-        {
-          nombre: "Grupo",
-          sesionActual: 8,
-          formadores: ["Aldair Coreas", "Elenilson Zelaya", "Karina Martínez"],
-          microproyectos: ["Demostrando habilidades físicas explorando la magia de los deportes"]
-        }
-      ]
-    },
-    {
-      nombre: "Complejo Educativo Mario Gómez",
-      departamento: "La Unión",
-      grupos: [
-        {
-          nombre: "Grupo 1",
-          sesionActual: 7,
-          formadores: ["Alfredo Ponce", "Juan Romero"],
-          microproyectos: ["Peleas o conflictos entre estudiantes durante los recesos", "Aislamiento o exclusión de algunos niños, niñas o jóvenes", "Situaciones de Bullying entre compañeros"]
-        },
-        {
-          nombre: "Grupo 2",
-          sesionActual: 7,
-          formadores: ["Amanda Álvarez", "José Carlos"],
-          microproyectos: ["Invisible pero real: El Bullying discreto"]
-        }
-      ]
-    },
-    {
-      nombre: "Centro Escolar Dolores Souza",
-      departamento: "San Miguel",
-      grupos: [
-        {
-          nombre: "Grupo",
-          sesionActual: 8,
-          formadores: ["Flora Abelina Moreira", "Ruth Nohemy Funes", "Jaime Omar Salmerón", "Marvin Turcios"],
-          microproyectos: ["Transformando los desechos en arte"]
-        }
-      ]
-    },
-    {
-      nombre: "Complejo Educativo Aminta de Montiel",
-      departamento: "San Miguel",
-      grupos: [
-        {
-          nombre: "Grupo",
-          sesionActual: 8,
-          formadores: ["Carrie Ashley Henríquez", "María Elena Pineda", "Alex Nolasco", "Dámaso López", "Génesis Amaya"],
-          microproyectos: ["Todos unidos somos mejores jugando, aprendiendo y cuidando el medio ambiente"]
-        }
-      ]
-    }
-  ];
-
-  const TOTAL_SESIONES = 8;
-
-  function construirCamino(sesionActual){
-    let html = '<div class="camino">';
-    for(let i = 1; i <= TOTAL_SESIONES; i++){
-      const completo = i < sesionActual;
-      const actual = i === sesionActual;
-      let clase = 'paso';
-      if(completo) clase += ' completo';
-      if(actual) clase += ' actual';
-      html += `<div class="paso-envoltorio"><div class="${clase}">${i}</div>`;
-      if(i < TOTAL_SESIONES){
-        html += `<div class="conector${completo ? ' completo' : ''}"></div>`;
-      }
-      html += '</div>';
-    }
-    html += '</div>';
-    return html;
-  }
-
-  function inicialesDe(nombre){
-    return nombre
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(p => p[0].toUpperCase())
-      .join('');
-  }
-
-  function construirFormadores(formadores){
-    if(!formadores || !formadores.length) return '';
-    const chips = formadores.map(f => `
-      <span class="formador">
-        <span class="inicial">${inicialesDe(f)}</span>${f}
-      </span>
-    `).join('');
-    return `
-      <div class="formadores">
-        <span class="formadores-etiqueta">Formadores</span>
-        ${chips}
-      </div>
-    `;
-  }
-
-  function construirMicroproyectos(microproyectos){
-    if(microproyectos && microproyectos.length){
-      return `
-        <div class="microproyectos">
-          <p class="micro-etiqueta">Microproyectos</p>
-          <div class="micro-lista">
-            ${microproyectos.map(m => `<span class="micro-chip">${m}</span>`).join('')}
-          </div>
+    <!-- Header Navigation -->
+    <header class="bg-gradient-to-r from-slate-900 via-brand-900 to-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 bg-brand-500/20 rounded-xl border border-brand-500/30">
+                        <i class="fa-solid fa-[#ffffff] fa-chart-line text-2xl text-brand-500"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white">Proyecto Agustine – Componente 1</h1>
+                        <p class="text-xs text-slate-300 font-medium">Informe de seguimiento de actividades socioformativas | Cohortes 2, 1 y 0</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 self-start md:self-auto">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-slate-300">Última actualización: <strong class="text-white">Octubre 2026</strong></span>
+                </div>
+            </div>
         </div>
-      `;
-    }
-    return `
-      <div class="microproyectos">
-        <p class="micro-etiqueta">Microproyectos</p>
-        <div class="micro-vacio">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            <circle cx="8" cy="11" r="0.8" fill="currentColor"/>
-          </svg>
-          No hay microproyectos registrados
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Banner de Alerta Prioritaria -->
+        <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-xl p-4 shadow-sm border border-amber-100/80">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl mt-0.5"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-sm font-bold text-amber-900 flex items-center gap-2">
+                        <span>Atención Requerida – Prioridad de Seguimiento</span>
+                        <span class="bg-amber-200 text-amber-800 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">Cohorte 2</span>
+                    </h3>
+                    <p class="mt-1 text-sm text-amber-800 leading-relaxed">
+                        En la Cohorte 2, el <strong class="font-semibold text-amber-950">Complejo Educativo Cantón Hato Nuevo</strong> y el <strong class="font-semibold text-amber-950">Centro Escolar Alberto Recino H (Grupo 1)</strong> tienen pendiente completar las tres sesiones de formación. 
+                        <span class="text-amber-700 text-xs block mt-1">*(Nota: El Grupo 2 del CE Alberto Recino H ya ha completado satisfactoriamente las tres sesiones).*</span>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
-    `;
-  }
 
-  function construirTarjeta(escuela){
-    const gruposHTML = escuela.grupos.map(g => `
-      <div class="grupo">
-        <div class="grupo-fila">
-          <span class="grupo-nombre">${g.nombre}</span>
-          <span class="grupo-sesion">Sesión ${g.sesionActual} de ${TOTAL_SESIONES}</span>
+        <!-- Metric Cards Grid & Progress -->
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Card 1 -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Centros Registrados</p>
+                        <h2 class="text-3xl font-extrabold text-slate-800 mt-1">8</h2>
+                        <p class="text-xs text-slate-500 mt-1">Distribuidos en 3 cohortes</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 border border-blue-100">
+                        <i class="fa-solid fa-school text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Centros Completados</p>
+                        <h2 class="text-3xl font-extrabold text-emerald-600 mt-1">6</h2>
+                        <p class="text-xs text-emerald-700 mt-1 font-medium">75.0% de cumplimiento</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-emerald-100">
+                        <i class="fa-solid fa-circle-check text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Requieren Seguimiento</p>
+                        <h2 class="text-3xl font-extrabold text-amber-600 mt-1">2</h2>
+                        <p class="text-xs text-amber-700 mt-1 font-medium">Ambos en Cohorte 2</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 border border-amber-100">
+                        <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Cohortes Activas</p>
+                        <h2 class="text-3xl font-extrabold text-indigo-600 mt-1">3</h2>
+                        <p class="text-xs text-slate-500 mt-1">Cohortes 0, 1 y 2</p>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 border border-indigo-100">
+                        <i class="fa-solid fa-layer-group text-xl"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Global Progress Bar Card -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <span class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-bars-progress text-brand-600"></i> Avance Global del Proyecto
+                    </span>
+                    <span class="text-sm font-bold text-slate-900">6 de 8 Centros Finalizados (75.0%)</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200/60">
+                    <div class="bg-gradient-to-r from-brand-500 to-emerald-500 h-full rounded-full transition-all duration-1000 ease-out" style="width: 75%;"></div>
+                </div>
+            </div>
         </div>
-        ${construirCamino(g.sesionActual)}
-        ${construirFormadores(g.formadores)}
-        ${construirMicroproyectos(g.microproyectos)}
-      </div>
-    `).join('');
 
-    return `
-      <article class="tarjeta" data-departamento="${escuela.departamento}">
-        <div class="tarjeta-cabecera">
-          <div>
-            <h2 class="nombre-escuela">${escuela.nombre}</h2>
-            <span class="depto">${escuela.departamento}</span>
-          </div>
-          <span class="grupos-total">${escuela.grupos.length} ${escuela.grupos.length > 1 ? 'grupos' : 'grupo'}</span>
+        <!-- Controles de Filtro -->
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-2 flex items-center gap-1">
+                    <i class="fa-solid fa-filter text-slate-400"></i> Filtrar Cohorte:
+                </span>
+                <button onclick="filterCohorts('all')" id="btn-cohort-all" class="cohort-btn text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand-600 text-white shadow-sm transition">Todas</button>
+                <button onclick="filterCohorts('c2')" id="btn-cohort-c2" class="cohort-btn text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Cohorte 2</button>
+                <button onclick="filterCohorts('c1')" id="btn-cohort-c1" class="cohort-btn text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Cohorte 1</button>
+                <button onclick="filterCohorts('c0')" id="btn-cohort-c0" class="cohort-btn text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Cohorte 0</button>
+            </div>
+
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-2">Estado:</span>
+                <select id="status-filter" onchange="applyFilters()" class="text-xs font-medium bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="all">Todos los estados</option>
+                    <option value="completed">Completados</option>
+                    <option value="pending">Pendientes de seguimiento</option>
+                </select>
+            </div>
         </div>
-        ${gruposHTML}
-      </article>
-    `;
-  }
 
-  function construirResumen(){
-    const totalEscuelas = datos.length;
-    const totalGrupos = datos.reduce((acc, e) => acc + e.grupos.length, 0);
-    const departamentos = new Set(datos.map(e => e.departamento)).size;
-    const sesionesAcumuladas = datos.reduce((acc, e) =>
-      acc + e.grupos.reduce((s, g) => s + g.sesionActual, 0), 0);
-    const sesionesPosibles = totalGrupos * TOTAL_SESIONES;
+        <!-- SECCIÓN COHORTE 2 -->
+        <section id="cohort-2-section" class="cohort-section space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-brand-600 inline-block"></span>
+                    Cohorte 2 – Estado de avance por centro educativo
+                </h2>
+                <span class="text-xs font-semibold text-slate-500 bg-slate-200/70 px-2.5 py-1 rounded-full">3 Centros Educativos</span>
+            </div>
 
-    const datosResumen = [
-      { num: totalEscuelas, etq: 'Centros educativos' },
-      { num: totalGrupos, etq: 'Grupos activos' },
-      { num: departamentos, etq: 'Departamentos' },
-      { num: `${sesionesAcumuladas}/${sesionesPosibles}`, etq: 'Sesiones completadas' }
-    ];
+            <!-- Grid de centros cohorte 2 -->
+            <div class="grid grid-cols-1 gap-6">
 
-    document.getElementById('resumen').innerHTML = datosResumen.map(d =>
-      `<div class="dato"><span class="num">${d.num}</span><span class="etq">${d.etq}</span></div>`
-    ).join('');
-  }
+                <!-- 2.1 Complejo Educativo Cantón Hato Nuevo -->
+                <div class="school-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden animate-fade-in" data-cohort="c2" data-status="pending">
+                    <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-amber-200">
+                                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Seguimiento pendiente
+                                </span>
+                                <span class="text-xs text-slate-400">ID: C2-01</span>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 mt-1">Complejo Educativo Cantón Hato Nuevo</h3>
+                        </div>
+                        <div class="text-xs bg-amber-50 text-amber-800 p-2.5 rounded-lg border border-amber-200/80 max-w-md">
+                            <strong class="font-semibold block text-amber-900">Pendiente principal:</strong>
+                            Completar las sesiones 2 y 3, así como entregar las evidencias y el listado de asistencia de estudiantes.
+                        </div>
+                    </div>
 
-  function construirFiltros(){
-    const departamentos = ['Todos', ...new Set(datos.map(e => e.departamento))];
-    const cont = document.getElementById('filtros');
-    cont.innerHTML = departamentos.map((d, i) =>
-      `<button class="chip${i === 0 ? ' activo' : ''}" data-filtro="${d}">${d}</button>`
-    ).join('');
+                    <div class="p-5 overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[500px]">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
+                                    <th class="py-2.5 px-4">Actividad o Evidencia</th>
+                                    <th class="py-2.5 px-4 text-center">Estado</th>
+                                    <th class="py-2.5 px-4 text-right">Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-sm">
+                                <tr>
+                                    <td class="py-3 px-4 font-medium text-slate-800">Sesión 1</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                            <i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> Realizada
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right text-xs text-slate-500">Sesión inicial finalizada</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-medium text-slate-800">Sesión 2</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                            <i class="fa-solid fa-clock mr-1.5 text-amber-600"></i> Pendiente de realizar
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right text-xs text-slate-500">Programación pendiente</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-medium text-slate-800">Sesión 3</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                            <i class="fa-solid fa-clock mr-1.5 text-amber-600"></i> Pendiente de realizar
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right text-xs text-slate-500">Programación pendiente</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-medium text-slate-800">Fotografías</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                            <i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> Recibidas
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right text-xs text-slate-500">Registros fotográficos entregados</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-medium text-slate-800">Evidencias de las sesiones</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">
+                                            <i class="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i> Pendientes
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right text-xs text-slate-500">Pendiente recepción documental</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-medium text-slate-800">Listado de asistencia de estudiantes</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">
+                                            <i class="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i> Pendiente
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right text-xs text-slate-500">Requiere entrega física/digital</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-    cont.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        cont.querySelectorAll('.chip').forEach(c => c.classList.remove('activo'));
-        chip.classList.add('activo');
-        const filtro = chip.dataset.filtro;
-        document.querySelectorAll('.tarjeta').forEach(t => {
-          const coincide = filtro === 'Todos' || t.dataset.departamento === filtro;
-          t.classList.toggle('oculta', !coincide);
-        });
-      });
-    });
-  }
+                <!-- 2.2 Centro Escolar Alberto Recino H -->
+                <div class="school-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden animate-fade-in" data-cohort="c2" data-status="pending">
+                    <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <h3 class="text-base font-bold text-slate-900">Centro Escolar Alberto Recino H</h3>
+                            <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md self-start sm:self-auto">Dividido por Grupos (2 Grupos)</span>
+                        </div>
+                    </div>
 
-  function renderizar(){
-    construirResumen();
-    construirFiltros();
-    document.getElementById('escuelas').innerHTML = datos.map(construirTarjeta).join('');
-  }
+                    <div class="p-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- Grupo 1 -->
+                        <div class="border border-amber-200 bg-amber-50/20 rounded-xl p-4 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                                        <i class="fa-solid fa-users text-amber-600"></i> Grupo 1
+                                    </span>
+                                    <span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-amber-200">
+                                        Seguimiento pendiente
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Sesión 1</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Realizada</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Sesión 2 y 3</span>
+                                        <span class="text-amber-700 font-semibold"><i class="fa-solid fa-clock text-amber-500 mr-1"></i>Pendientes</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Fotografías</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Recibidas</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Evidencias Sesión 1</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Recibidas</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Listado de Asistencia</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Recibido</span>
+                                    </div>
+                                </div>
+                            </div>
 
-  renderizar();
-</script>
+                            <div class="mt-4 pt-3 border-t border-amber-200/60 text-xs text-amber-900 bg-amber-100/40 p-2.5 rounded-lg">
+                                <strong class="font-bold block text-amber-950">Pendiente principal:</strong>
+                                Completar las sesiones 2 y 3 y entregar las evidencias correspondientes.
+                            </div>
+                        </div>
 
+                        <!-- Grupo 2 -->
+                        <div class="border border-sky-200 bg-sky-50/20 rounded-xl p-4 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                                        <i class="fa-solid fa-users text-sky-600"></i> Grupo 2
+                                    </span>
+                                    <span class="bg-sky-100 text-sky-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-sky-200">
+                                        Pendiente de evidencia final
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Sesiones 1, 2 y 3</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Completadas</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Fotografías</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Recibidas</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Evidencias</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Recibidas</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-slate-100">
+                                        <span class="text-slate-600">Listado de Asistencia</span>
+                                        <span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Recibido</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-white p-2 rounded border border-amber-200">
+                                        <span class="text-slate-800 font-medium">Video del Prototipo</span>
+                                        <span class="text-amber-700 font-semibold"><i class="fa-solid fa-video text-amber-500 mr-1"></i>Pendiente</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-sky-200/60 text-xs text-sky-900 bg-sky-100/40 p-2.5 rounded-lg">
+                                <strong class="font-bold block text-sky-950">Pendiente principal:</strong>
+                                Entregar el video del prototipo para completar las evidencias del grupo.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 2.3 Centro Escolar Ciudad Jardín -->
+                <div class="school-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden animate-fade-in" data-cohort="c2" data-status="completed">
+                    <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                    <i class="fa-solid fa-circle-check mr-1"></i> Sesiones completadas
+                                </span>
+                                <span class="text-xs text-slate-400">ID: C2-03</span>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-900 mt-1">Centro Escolar Ciudad Jardín</h3>
+                        </div>
+                        <div class="text-xs bg-emerald-50 text-emerald-800 p-2.5 rounded-lg border border-emerald-200 flex items-center gap-2">
+                            <i class="fa-solid fa-award text-emerald-600 text-base"></i>
+                            <div>
+                                <strong class="font-bold block text-emerald-950">Estado Final:</strong>
+                                Las tres sesiones y las evidencias solicitadas se encuentran completas.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            <div class="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+                                <div class="text-emerald-600 mb-1"><i class="fa-solid fa-calendar-check text-lg"></i></div>
+                                <div class="text-xs font-semibold text-slate-800">Sesiones 1, 2 y 3</div>
+                                <div class="text-[11px] text-emerald-600 font-bold mt-1">Completadas</div>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+                                <div class="text-emerald-600 mb-1"><i class="fa-solid fa-camera text-lg"></i></div>
+                                <div class="text-xs font-semibold text-slate-800">Fotografías</div>
+                                <div class="text-[11px] text-emerald-600 font-bold mt-1">Recibidas</div>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+                                <div class="text-emerald-600 mb-1"><i class="fa-solid fa-file-lines text-lg"></i></div>
+                                <div class="text-xs font-semibold text-slate-800">Evidencias</div>
+                                <div class="text-[11px] text-emerald-600 font-bold mt-1">Recibidas</div>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+                                <div class="text-emerald-600 mb-1"><i class="fa-solid fa-clipboard-user text-lg"></i></div>
+                                <div class="text-xs font-semibold text-slate-800">Listado Asistencia</div>
+                                <div class="text-[11px] text-emerald-600 font-bold mt-1">Recibido</div>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center col-span-2 sm:col-span-1">
+                                <div class="text-emerald-600 mb-1"><i class="fa-solid fa-video text-lg"></i></div>
+                                <div class="text-xs font-semibold text-slate-800">Video Prototipo</div>
+                                <div class="text-[11px] text-emerald-600 font-bold mt-1">Recibido</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECCIÓN COHORTE 1 -->
+        <section id="cohort-1-section" class="cohort-section space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                    Cohorte 1 – Estado de avance
+                </h2>
+                <span class="text-xs font-semibold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full">2 Centros (100% Completado)</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div class="school-card bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between animate-fade-in" data-cohort="c1" data-status="completed">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Complejo Educativo Aminta de Montiel</h3>
+                            <p class="text-xs text-slate-500">Cohorte 1 • Actividades socioformativas</p>
+                        </div>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200">
+                        Completado
+                    </span>
+                </div>
+
+                <div class="school-card bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between animate-fade-in" data-cohort="c1" data-status="completed">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Centro Escolar Dolores Souza</h3>
+                            <p class="text-xs text-slate-500">Cohorte 1 • Actividades socioformativas</p>
+                        </div>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200">
+                        Completado
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECCIÓN COHORTE 0 -->
+        <section id="cohort-0-section" class="cohort-section space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-slate-600 inline-block"></span>
+                    Cohorte 0 – Estado de avance
+                </h2>
+                <span class="text-xs font-semibold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full">3 Centros (100% Completado)</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <div class="school-card bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between animate-fade-in" data-cohort="c0" data-status="completed">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Instituto Nacional de Nueva Guadalupe</h3>
+                            <p class="text-[11px] text-slate-500">Cohorte 0</p>
+                        </div>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">
+                        Completado
+                    </span>
+                </div>
+
+                <div class="school-card bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between animate-fade-in" data-cohort="c0" data-status="completed">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Centro Escolar María Luisa Parada</h3>
+                            <p class="text-[11px] text-slate-500">Cohorte 0</p>
+                        </div>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">
+                        Completado
+                    </span>
+                </div>
+
+                <div class="school-card bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between animate-fade-in" data-cohort="c0" data-status="completed">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Complejo Educativo Mario Gómez</h3>
+                            <p class="text-[11px] text-slate-500">Cohorte 0</p>
+                        </div>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">
+                        Completado
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-medium text-slate-600">Proyecto Agustine – Componente 1 | Sistema de Seguimiento Socioformativo</p>
+            <p class="mt-1 text-slate-400">Documento de monitoreo y control de cumplimiento institucional.</p>
+        </div>
+    </footer>
+
+    <!-- Logic JavaScript -->
+    <script>
+        let currentCohort = 'all';
+
+        function filterCohorts(cohort) {
+            currentCohort = cohort;
+
+            // Actualizar estilos de botones
+            document.querySelectorAll('.cohort-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-slate-100', 'text-slate-600');
+            });
+
+            const activeBtn = document.getElementById(`btn-cohort-${cohort}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
+                activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+            }
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const schoolCards = document.querySelectorAll('.school-card');
+
+            schoolCards.forEach(card => {
+                const cardCohort = card.getAttribute('data-cohort');
+                const cardStatus = card.getAttribute('data-status');
+
+                const matchesCohort = (currentCohort === 'all' || cardCohort === currentCohort);
+                const matchesStatus = (statusFilter === 'all' || cardStatus === statusFilter);
+
+                if (matchesCohort && matchesStatus) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Ocultar/Mostrar secciones completas de cohorte si no tienen tarjetas visibles
+            const cohortSections = [
+                { id: 'cohort-2-section', cohortKey: 'c2' },
+                { id: 'cohort-1-section', cohortKey: 'c1' },
+                { id: 'cohort-0-section', cohortKey: 'c0' }
+            ];
+
+            cohortSections.forEach(sectionInfo => {
+                const section = document.getElementById(sectionInfo.id);
+                if (section) {
+                    const visibleCards = section.querySelectorAll(`.school-card[data-cohort="${sectionInfo.cohortKey}"]`);
+                    let hasVisibleCard = false;
+
+                    visibleCards.forEach(c => {
+                        if (c.style.display !== 'none') {
+                            hasVisibleCard = true;
+                        }
+                    });
+
+                    if (hasVisibleCard) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
